@@ -15,7 +15,7 @@ Install prerequisites:
 
 ```
 $ sudo apt-get update
-$ sudo apt-get install zip git
+$ sudo apt-get install git zip
 ```
 
 Change the the home directory and clone from git:
@@ -49,7 +49,7 @@ Note: it is recommended that 'backup_root_path' be set to a location *not* on th
 
 ### From command-line
 
-Run a backup:
+Run a backup (from the install directory):
 ```
 $ ./partkeepr-backup.sh
 ```
@@ -62,10 +62,10 @@ To automate the backup each day:
 $ crontab -e
 ```
 
-Add the following line to schedule a backup at 2:30AM each day. Adjust to your install path if needed:
+Add the following line to schedule a backup at 2:15AM each day. Adjust to your install path if needed:
 
 ```
-15 2 * * * /home/pi/PartKeepr-Backup/partkeepr-backup.sh
+15 2 * * * cd /home/pi/PartKeepr-Backup && /bin/sh ./partkeepr-backup.sh
 ```
 
 ## What is does
