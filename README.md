@@ -111,6 +111,38 @@ Example:
 
 This log details the date of the backup, files written, backup size, and duration.
 
+Example log output:
+
+```
+PartKeepr Backup 0.1.1
+
+Database backup:
+Retrieving database SQL...
+* Success
+Compressing backup to ZIP archive...
+* Success
+Database backup summary:
+* File name:   20200906-121932_partkeepr-database-backup.sql.zip
+* File size:   55K
+* Duration:    0:00:01
+
+Web data backup:
+Compressing web data to ZIP archive...
+* Success
+Web data backup summary:
+* File name:   20200906-121932_partkeepr-data-backup.zip
+* File size:   15M
+* Duration:    0:00:05
+
+Web config backup:
+Compressing web config to ZIP archive...
+* Success
+Web config backup summary:
+* File name:   20200906-121932_partkeepr-config-backup.zip
+* File size:   20K
+* Duration:    0:00:00
+```
+
 ## Notes / improvements / to-do
 
 - Currently backups are full snapshots, not incremental. This is nice and simple, but uses much more backup storage. It may be worth automatically removing old backups? For the time being backup storage need to be managed by the user.
