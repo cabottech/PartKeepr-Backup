@@ -16,7 +16,7 @@
 # - Licence: MIT (see the LICENSE file)
 
 
-ver="0.1.1"
+ver="0.1.2"
 echo "PartKeepr Backup $ver"
 
 # Source the script settings
@@ -38,9 +38,9 @@ backup_database() {
 		return 1
 	fi
 
-    echo "Compressing backup to ZIP archive..." | tee -a $backup_path/$log_file
-    # Zip with maximum compression. Run at low priority.
-    res="$( nice -10 zip -j -m -q -T -9 "$backup_path/$backup_file.zip" "$backup_path/$backup_file" )"
+	echo "Compressing backup to ZIP archive..." | tee -a $backup_path/$log_file
+	# Zip with maximum compression. Run at low priority.
+	res="$( nice -n 10 zip -j -m -q -T -9 "$backup_path/$backup_file.zip" "$backup_path/$backup_file" )"
 	if $res
 	then
 		echo "* Success" | tee -a $backup_path/$log_file
@@ -59,9 +59,9 @@ backup_app_data() {
 	local backup_file="${date_start}_partkeepr-data-backup.zip"
 
 	echo "Web data backup:" | tee -a $backup_path/$log_file
-    echo "Compressing web data to ZIP archive..." | tee -a $backup_path/$log_file
-    # Zip with maximum compression. Run at low priority.
-    res="$( nice -10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_data_path" )"
+	echo "Compressing web data to ZIP archive..." | tee -a $backup_path/$log_file
+	# Zip with maximum compression. Run at low priority.
+	res="$( nice -n 10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_data_path" )"
 	if $res
 	then
 		echo "* Success" | tee -a $backup_path/$log_file
@@ -80,9 +80,9 @@ backup_app_config() {
 	local backup_file="${date_start}_partkeepr-config-backup.zip"
 
 	echo "Web config backup:" | tee -a $backup_path/$log_file
-    echo "Compressing web config to ZIP archive..." | tee -a $backup_path/$log_file
-    # Zip with maximum compression. Run at low priority.
-    res="$( nice -10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_config_path" )"
+	echo "Compressing web config to ZIP archive..." | tee -a $backup_path/$log_file
+	# Zip with maximum compression. Run at low priority.
+	res="$( nice -n 10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_config_path" )"
 	if $res
 	then
 		echo "* Success" | tee -a $backup_path/$log_file
