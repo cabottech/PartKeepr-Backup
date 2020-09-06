@@ -1,4 +1,4 @@
-# PartKeepr Backup
+# PartKeepr-Backup
 
 A Linux shell script that creates a backup of a [PartKeepr](https://github.com/partkeepr/PartKeepr) database and important web files. Backups are conveniently compressed using zip to date-time-stamped filenames.
 
@@ -18,14 +18,14 @@ $ sudo apt-get update
 $ sudo apt-get install git zip
 ```
 
-Change the the home directory and clone from git:
+Change to the home directory and clone from git:
 
 ```
 $ cd ~
 $ git clone https://github.com/cabottech/PartKeepr-Backup.git
 ```
 
-Change to the new app directory and set permissions to execute the script:
+Change to the script directory and set permissions to execute the script:
 
 ```
 $ cd PartKeepr-Backup
@@ -45,7 +45,7 @@ You'll need to set the database connection and file locations properties specifi
 
 Ensure the user has permissions to read/write to the `backup_root_path`.
 
-Note: it is recommended that 'backup_root_path' be set to a location *not* on the SD card. A safer location for backups would be a mounted USB drive, or mounted network folder. This ensures that in the event of SD card corruption or fault, the backups aren't also lost.
+Note: it is recommended that `backup_root_path` be set to a location *not* on the Raspberry Pi's SD card. A safer location for backups would be a mounted USB drive, or mounted network folder. This ensures that in the event of SD card corruption or fault, the backups aren't also lost.
 
 ## How to use
 
@@ -70,7 +70,44 @@ Add the following line to schedule a backup at 2:15AM each day. Adjust to your i
 15 2 * * * cd /home/pi/PartKeepr-Backup && /bin/sh ./partkeepr-backup.sh
 ```
 
-## What is does
+### Storing backups on a network share folder
+
+The following is a simple example of mounting a CIFS/SAMBA network share folder and configuring this as the backup storage location.
+
+First, create a mount location:
+```
+$ sudo mkdir /mnt/backups
+```
+
+Mount the network share folder:
+
+Options:
+- `//fileserver.local/backups/PartKeepr` is the path to an existing network share folder. An IP address can also be used, i.e. `//192.168.1.123/backups/PartKeepr`.
+- `username=remoteuser` is to authenticate with the file server (you will be prompted for a password if applicable)
+- `uid=pi` is to set local user `pi` as the owner of the share to allow read/write access.
+- `noexec` disables executing anything from the share location (an optional safety precaution).
+```
+$ sudo mount -t cifs //fileserver.local/backups/PartKeepr /mnt/backups -o username=remoteuser,uid=pi,noexec
+```
+
+Enter your network share password when prompted.
+
+Now that we have the network share connected, `partkeepr-backup.preferences` can be set accordingly. Update the backup location:
+```
+backup_root_path=/mnt/backups
+```
+
+Run a backup to check this is all working:
+```
+$ cd ~/PartKeepr
+$ ./partkeepr-backup.sh
+```
+
+The backup files should be now stored the network share folder.
+
+If the network share folder is required to be auto-mounted on Raspberry Pi boot, the `/etc/fstab` file can be configured (this is beyond the scope of this example).
+
+## What it does
 
 When the script `partkeepr-backup.sh` is run (i.e. from command-line or cronjob), backups are created, archived to ZIP, and stored as date-time-stamped files.
 
@@ -146,6 +183,5 @@ Web config backup summary:
 ## Notes / improvements / to-do
 
 - Currently backups are full snapshots, not incremental. This is nice and simple, but uses much more backup storage. It may be worth automatically removing old backups? For the time being backup storage need to be managed by the user.
-- An example of how to backup to network location (with auto-mount) would be nice too.
 - Send backup error notifications via syslog/mail?
 - Add a step-by-step guide for backup recovery.
