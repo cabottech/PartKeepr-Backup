@@ -53,6 +53,7 @@ Note: it is recommended that `backup_root_path` be set to a location *not* on th
 
 Run a backup:
 ```
+cd ~/PartKeepr-Backup
 $ ./partkeepr-backup.sh
 ```
 
@@ -99,7 +100,7 @@ backup_root_path=/mnt/backups
 
 Run a backup to check this is all working:
 ```
-$ cd ~/PartKeepr
+$ cd ~/PartKeepr-Backup
 $ ./partkeepr-backup.sh
 ```
 
@@ -151,7 +152,7 @@ This log details the date of the backup, files written, backup size, and duratio
 Example log output:
 
 ```
-PartKeepr Backup 0.1.1
+PartKeepr Backup 0.1.2
 
 Database backup:
 Retrieving database SQL...
@@ -159,7 +160,7 @@ Retrieving database SQL...
 Compressing backup to ZIP archive...
 * Success
 Database backup summary:
-* File name:   20200906-121932_partkeepr-database-backup.sql.zip
+* File name:   20200907-021501_partkeepr-database-backup.sql.zip
 * File size:   55K
 * Duration:    0:00:01
 
@@ -167,15 +168,15 @@ Web data backup:
 Compressing web data to ZIP archive...
 * Success
 Web data backup summary:
-* File name:   20200906-121932_partkeepr-data-backup.zip
+* File name:   20200907-021501_partkeepr-data-backup.zip
 * File size:   15M
-* Duration:    0:00:05
+* Duration:    0:00:08
 
 Web config backup:
 Compressing web config to ZIP archive...
 * Success
 Web config backup summary:
-* File name:   20200906-121932_partkeepr-config-backup.zip
+* File name:   20200907-021501_partkeepr-config-backup.zip
 * File size:   20K
 * Duration:    0:00:00
 ```
