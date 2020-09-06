@@ -1,6 +1,6 @@
 # PartKeepr Backup
 
-A Linux shell script that creates a backup of a [PartKeepr](https://github.com/partkeepr/PartKeepr) database and relevant data and config web files. Backups are conveniently archived to ZIP files with date-time stamped filenames.
+A Linux shell script that creates a backup of a [PartKeepr](https://github.com/partkeepr/PartKeepr) database and important web files. Backups are conveniently compressed using zip to date-time-stamped filenames.
 
 Tested with [PartKeepr 1.4.0 on Raspbian 9.13 (stretch)](https://wiki.partkeepr.org/wiki/PartKeepr_1.4.0_installation_on_a_Raspberry_Pi)
 
@@ -43,13 +43,15 @@ Settings can be modified in the `partkeepr-backup.properties` file.
 
 You'll need to set the database connection and file locations properties specific to your system and installation.
 
+Ensure the user has permissions to read/write to the `backup_root_path`.
+
 Note: it is recommended that 'backup_root_path' be set to a location *not* on the SD card. A safer location for backups would be a mounted USB drive, or mounted network folder. This ensures that in the event of SD card corruption or fault, the backups aren't also lost.
 
 ## How to use
 
 ### From command-line
 
-Run a backup (from the install directory):
+Run a backup:
 ```
 $ ./partkeepr-backup.sh
 ```
@@ -78,7 +80,7 @@ Upon execution the backup path is created based on the 'backup_root_path' proper
 
 Example:
 
-- `/home/pi/PartKeepr-Backups/202009/`
+- `/home/pi/PartKeepr-Backup/backups/202009/`
 
 The backups and log will be stored in this directory.
 
@@ -109,7 +111,9 @@ Example:
 
 This log details the date of the backup, files written, backup size, and duration.
 
-## Improvements / to-do
+## Notes / improvements / to-do
 
-- Currently backups are full snapshots, not incremental. This is nice and simple, but uses much more backup storage.
-- Example of backup to network location. Auto-mount would be nice too.
+- Currently backups are full snapshots, not incremental. This is nice and simple, but uses much more backup storage. It may be worth automatically removing old backups? For the time being backup storage need to be managed by the user.
+- An example of how to backup to network location (with auto-mount) would be nice too.
+- Send backup error notifications via syslog/mail?
+- Add a step-by-step guide for backup recovery.

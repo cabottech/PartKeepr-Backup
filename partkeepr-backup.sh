@@ -1,26 +1,24 @@
 #!/bin/sh
 
-# PartKeepr Backup
+# PartKeepr-Backup
 # 
-# Performs a backup of the PartKeepr database and relevent files (data and config).
-# Creates a ZIP archive with a date-time stamped filename.
-# Modify the associated pk-backup.property file with you system specifics.
+# A Linux shell script that creates a backup of a PartKeepr database and
+# important web files. Backups are conveniently compressed using zip to
+# date-time-stamped filenames.
 #
-# See README.md for further details and instructions.
-# 
-# License: MIT
-# 
-# Author: Darian, https://cabottechnologies.com
+# Configure by modifying the partkeepr-backup.property file. See README.md for
+# further details and instructions.
 #
-# Tested with:
-# - PartKeepr 1.4.0 on Raspbian 9.13 (stretch)
+# Tested with PartKeepr 1.4.0 on Raspbian 9.13 (stretch) -
+# https://wiki.partkeepr.org/wiki/PartKeepr_1.4.0_installation_on_a_Raspberry_Pi
 #
-# Requires:
-# - 'zip' package.
+# - Author: Cabot Technologies - https://cabottechnologies.com
+# - Licence: MIT (see the LICENSE file)
+
 
 echo "PartKeepr Backup 0.1"
 
-# Source the script config file:
+# Source the script settings
 . ./partkeepr-backup.properties
 
 
@@ -39,7 +37,7 @@ backup_database() {
 	fi
 
     printf "Compressing backup to ZIP archive...\n" | tee -a $backup_path/$log_file
-    # Zip the SQL file with maximum compression. This is CPU intensive, so nice 10 is used (low priority).
+    # Zip with maximum compression. Run at low priority.
     res="$( nice -10 zip -j -m -q -T -9 "$backup_path/$backup_file.zip" "$backup_path/$backup_file" )"
 	if $res
 	then
@@ -49,19 +47,8 @@ backup_database() {
 		return 1
 	fi
 
-	# Print a backup summary...
 	printf "PartKeepr database backup completed:\n" | tee -a $backup_path/$log_file
-	printf "* File name:   $backup_file.zip\n" | tee -a $backup_path/$log_file
-	local filesize=$(ls -lsah "$backup_path/$backup_file.zip" | awk '{print $6}')
-	printf "* File size:   $filesize\n" | tee -a $backup_path/$log_file
-
-	local dur_sec=$(( $(date +%s) - $start ))
-	local hr=$(( $dur_sec / 3600 )) # Calculate hours.
-	local min=$(( ($dur_sec % 3600) / 60 )) # Calculate remaining minutes.
-	local sec=$(( $dur_sec % 60 )) # Calculate remaining seconds.
-	min=$(printf "%02d" $min) # Ensure two digits (zero padding).
-	sec=$(printf "%02d" $sec) # Ensure two digits (zero padding).
-	printf "* Duration:    $hr:$min:$sec\n\n" | tee -a $backup_path/$log_file
+	backup_summary "$backup_file.zip" "$start"
 }
 
 
@@ -72,7 +59,7 @@ backup_app_data() {
 	printf "PartKeepr web data backup started...\n" | tee -a $backup_path/$log_file
 
     printf "Compressing web data to ZIP archive...\n" | tee -a $backup_path/$log_file
-    # Zip the directory file maximum compression. This is CPU intensive, so nice 10 is used (low priority).
+    # Zip with maximum compression. Run at low priority.
     res="$( nice -10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_data_path" )"
 	if $res
 	then
@@ -82,19 +69,8 @@ backup_app_data() {
 		return 1
 	fi
 
-	# Print a backup summary...
 	printf "PartKeepr web data backup completed:\n" | tee -a $backup_path/$log_file
-	printf "* File name:   $backup_file\n" | tee -a $backup_path/$log_file
-	local filesize=$(ls -lsah "$backup_path/$backup_file" | awk '{print $6}')
-	printf "* File size:   $filesize\n" | tee -a $backup_path/$log_file
-
-	local dur_sec=$(( $(date +%s) - $start ))
-	local hr=$(( $dur_sec / 3600 )) # Calculate hours.
-	local min=$(( ($dur_sec % 3600) / 60 )) # Calculate remaining minutes.
-	local sec=$(( $dur_sec % 60 )) # Calculate remaining seconds.
-	min=$(printf "%02d" $min) # Ensure two digits (zero padding).
-	sec=$(printf "%02d" $sec) # Ensure two digits (zero padding).
-	printf "* Duration:    $hr:$min:$sec\n\n" | tee -a $backup_path/$log_file
+	backup_summary "$backup_file" "$start"
 }
 
 
@@ -105,7 +81,7 @@ backup_app_config() {
 	printf "PartKeepr web config backup started...\n" | tee -a $backup_path/$log_file
 
     printf "Compressing web config to ZIP archive...\n" | tee -a $backup_path/$log_file
-    # Zip the directory file maximum compression. This is CPU intensive, so nice 10 is used (low priority).
+    # Zip with maximum compression. Run at low priority.
     res="$( nice -10 zip -q -r -T -9 "$backup_path/$backup_file" "$partkeepr_config_path" )"
 	if $res
 	then
@@ -115,13 +91,21 @@ backup_app_config() {
 		return 1
 	fi
 
-	# Print a backup summary...
 	printf "PartKeepr web config backup completed:\n" | tee -a $backup_path/$log_file
-	printf "* File name:   $backup_file\n" | tee -a $backup_path/$log_file
-	local filesize=$(ls -lsah "$backup_path/$backup_file" | awk '{print $6}')
+	backup_summary "$backup_file" "$start"
+}
+
+
+# Prints/logs a backup file summary
+# $1 is the filename
+# $2 is the start time - i.e. '$(date +%s)'
+# Requires the global variable $backup_path be set.
+backup_summary() {
+	printf "* File name:   $1\n" | tee -a $backup_path/$log_file
+	local filesize=$(ls -lsah "$backup_path/$1" | awk '{print $6}')
 	printf "* File size:   $filesize\n" | tee -a $backup_path/$log_file
 
-	local dur_sec=$(( $(date +%s) - $start ))
+	local dur_sec=$(( $(date +%s) - $2 ))
 	local hr=$(( $dur_sec / 3600 )) # Calculate hours.
 	local min=$(( ($dur_sec % 3600) / 60 )) # Calculate remaining minutes.
 	local sec=$(( $dur_sec % 60 )) # Calculate remaining seconds.
@@ -139,14 +123,12 @@ log_file="${date_start}_partkeepr-backup.log"
 printf "* Backup path: $backup_path\n"
 printf "* Log: $log_file\n\n"
 
-# Create backup path and set permissions...
+# Create backup path...
 mkdir -p $backup_path
-chmod 755 $backup_path
-
 
 # Run backups
 backup_database
 backup_app_data
 backup_app_config
 
-printf "Backup finished\n\n"
+printf "PartKeepr backup finished\n\n" | tee -a $backup_path/$log_file
